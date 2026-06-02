@@ -178,9 +178,9 @@ const serviceItems = [
 const defaultSettings: Settings = {
   agencyName: 'VELOCE AUTO',
   address: 'Hydra, Algiers, Algeria',
-  phone: '+213 555 010 990',
-  whatsapp: '+213 555 010 990',
-  email: 'contact@veloceauto.dz',
+  phone: '+213 676 346 072',
+  whatsapp: '+213 676 346 072',
+  email: 'bezzaamina31@gmail.com',
   hours: 'Sat - Thu: 09:00 - 19:00'
 };
 
@@ -249,7 +249,7 @@ const initialVehicles: Vehicle[] = [
     color: 'Rosso Corsa',
     status: 'new',
     is_featured: true,
-    images: ['https://images.unsplash.com/photo-1593941707882-a5bfc1c1c0b7?auto=format&fit=crop&w=1400&q=80', 'https://images.unsplash.com/photo-1511919884226-fd3cad34687c?auto=format&fit=crop&w=1400&q=80'],
+    images: ['https://images.unsplash.com/photo-1583121274602-3e2820c69888?auto=format&fit=crop&w=1400&q=80', 'https://images.unsplash.com/photo-1511919884226-fd3cad34687c?auto=format&fit=crop&w=1400&q=80'],
     description: 'A modern interpretation of Ferrari elegance with an architecture of speed, luxury, and minimalistic sculpture.',
     power: '612 hp',
     torque: '760 Nm',
@@ -343,9 +343,50 @@ function writeLocal<T>(key: string, value: T) {
 }
 
 function seedLocalData() {
+  const storedRaw = window.localStorage.getItem(localKeys.vehicles);
+  if (storedRaw && storedRaw.includes('photo-1593941707882-a5bfc1c1c0b7')) {
+    try {
+      const stored = JSON.parse(storedRaw) as Vehicle[];
+      const updated = stored.map(v => {
+        if (v.images && v.images.includes('https://images.unsplash.com/photo-1593941707882-a5bfc1c1c0b7?auto=format&fit=crop&w=1400&q=80')) {
+          v.images = v.images.map(img => 
+            img === 'https://images.unsplash.com/photo-1593941707882-a5bfc1c1c0b7?auto=format&fit=crop&w=1400&q=80'
+              ? 'https://images.unsplash.com/photo-1583121274602-3e2820c69888?auto=format&fit=crop&w=1400&q=80'
+              : img
+          );
+        }
+        return v;
+      });
+      writeLocal(localKeys.vehicles, updated);
+    } catch (e) {
+      window.localStorage.removeItem(localKeys.vehicles);
+    }
+  }
+
   if (!window.localStorage.getItem(localKeys.vehicles)) writeLocal(localKeys.vehicles, initialVehicles);
   if (!window.localStorage.getItem(localKeys.leads)) writeLocal<Lead[]>(localKeys.leads, []);
   if (!window.localStorage.getItem(localKeys.brands)) writeLocal(localKeys.brands, brands.map((name) => ({ id: name.toLowerCase().replace(/[^a-z0-9]+/g, '-'), name })));
+
+  // Migrate settings for existing users to the new contact info
+  const storedSettingsRaw = window.localStorage.getItem(localKeys.settings);
+  if (storedSettingsRaw && (storedSettingsRaw.includes('+213 555 010 990') || storedSettingsRaw.includes('contact@veloceauto.dz'))) {
+    try {
+      const storedSettings = JSON.parse(storedSettingsRaw) as Settings;
+      if (storedSettings.phone === '+213 555 010 990') {
+        storedSettings.phone = '+213 676 346 072';
+      }
+      if (storedSettings.whatsapp === '+213 555 010 990') {
+        storedSettings.whatsapp = '+213 676 346 072';
+      }
+      if (storedSettings.email === 'contact@veloceauto.dz') {
+        storedSettings.email = 'bezzaamina31@gmail.com';
+      }
+      writeLocal(localKeys.settings, storedSettings);
+    } catch (e) {
+      window.localStorage.removeItem(localKeys.settings);
+    }
+  }
+
   if (!window.localStorage.getItem(localKeys.settings)) writeLocal(localKeys.settings, defaultSettings);
 }
 
@@ -1208,63 +1249,108 @@ function InfoLine({ icon: Icon, label, value }: { icon: React.ElementType; label
 
 function Footer({ settings }: { settings: Settings }) {
   return (
-    <footer className="border-t border-white/10 bg-black py-12">
+    <footer className="border-t border-white/5 bg-[#06080c] py-16 text-white/70">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="grid gap-10 lg:grid-cols-[1fr_auto_auto]">
+        <div className="grid gap-12 sm:grid-cols-2 md:grid-cols-4">
+          {/* Column 1: Brand Info */}
           <div>
-            <div className="flex items-center gap-3">
-              <LogoIcon className="h-12 w-12" />
-              <div>
-                <div className="font-serif text-5xl text-white">VELOCE</div>
-                <div className="mt-1 text-xs uppercase tracking-[0.5em] text-gold">AUTO</div>
+            <a href="#home" className="flex items-center gap-3">
+              <LogoIcon className="h-11 w-11 text-gold" />
+              <div className="flex flex-col leading-none">
+                <span className="font-serif text-2xl font-bold tracking-[0.18em] text-[#f2eee4]">VELOCE</span>
+                <span className="text-[10px] uppercase tracking-[0.52em] text-gold/85">AUTO</span>
               </div>
-            </div>
-            <p className="mt-4 max-w-md text-sm leading-7 text-white/60">Premium automotive agency for curated luxury vehicles, private consultations, and concierge-level service in Algiers.</p>
-          </div>
-          <FooterLinks title="Navigation" links={navLinks} />
-          <FooterLinks title="Services" links={serviceItems.map(([, title]) => title)} />
-        </div>
-        <div className="mt-10 grid gap-6 border-t border-white/10 pt-8 lg:grid-cols-[1fr_auto] lg:items-end">
-          <div>
-            <p className="text-xs uppercase tracking-[0.35em] text-gold">Newsletter</p>
-            <div className="mt-3 flex max-w-md gap-3">
-              <input className="luxury-input" placeholder="Email address" />
-              <button className="shrink-0 border border-gold bg-gold px-5 py-3 text-xs font-semibold uppercase tracking-[0.24em] text-black">Join</button>
-            </div>
-          </div>
-          <div className="flex flex-wrap items-center gap-3 text-sm text-white/60">
-            {[[Instagram, 'Instagram'], [Facebook, 'Facebook'], [Youtube, 'YouTube'], [FaTiktok, 'TikTok']].map(([Icon, label]) => (
-              <a key={label as string} href="#" className="flex items-center gap-2 border border-white/10 bg-white/5 px-4 py-3 transition hover:border-gold/40 hover:text-gold">
-                <Icon className="h-4 w-4" />
-                {label as string}
+            </a>
+            <p className="mt-6 text-sm leading-relaxed text-white/50">
+              Defining excellence in Algeria's luxury automotive market since 2010. We specialize in factory-fresh luxury vehicles, premium pre-owned selection, and white-glove import services in Algiers.
+            </p>
+            <div className="mt-6 flex gap-4">
+              <a href="https://instagram.com/meeena.aa" target="_blank" rel="noreferrer" className="text-white/40 hover:text-gold transition-colors">
+                <Instagram className="h-5 w-5" />
               </a>
-            ))}
+              <a href="#" className="text-white/40 hover:text-gold transition-colors">
+                <Facebook className="h-5 w-5" />
+              </a>
+              <a href="mailto:bezzaamina31@gmail.com" className="text-white/40 hover:text-gold transition-colors">
+                <Mail className="h-5 w-5" />
+              </a>
+              <a href="#" className="text-white/40 hover:text-gold transition-colors">
+                <Globe className="h-5 w-5" />
+              </a>
+            </div>
+          </div>
+
+          {/* Column 2: Company */}
+          <div>
+            <h3 className="font-sans text-sm font-semibold uppercase tracking-[0.2em] text-gold">Company</h3>
+            <ul className="mt-6 space-y-4 text-sm">
+              <li>
+                <a href="#about" className="text-white/50 hover:text-gold transition-colors">About Us</a>
+              </li>
+              <li>
+                <a href="#services" className="text-white/50 hover:text-gold transition-colors">Our Services</a>
+              </li>
+              <li>
+                <a href="#contact" className="text-white/50 hover:text-gold transition-colors">Contact Us</a>
+              </li>
+              <li>
+                <a href="#" className="text-white/50 hover:text-gold transition-colors">Terms of Service</a>
+              </li>
+              <li>
+                <a href="#" className="text-white/50 hover:text-gold transition-colors">Privacy Policy</a>
+              </li>
+            </ul>
+          </div>
+
+          {/* Column 3: Discover */}
+          <div>
+            <h3 className="font-sans text-sm font-semibold uppercase tracking-[0.2em] text-gold">Discover</h3>
+            <ul className="mt-6 space-y-4 text-sm">
+              <li>
+                <a href="#inventory" className="text-white/50 hover:text-gold transition-colors">New Vehicles</a>
+              </li>
+              <li>
+                <a href="#inventory" className="text-white/50 hover:text-gold transition-colors">Pre-Owned Selection</a>
+              </li>
+              <li>
+                <a href="#inventory" className="text-white/50 hover:text-gold transition-colors">Exclusive Imports</a>
+              </li>
+              <li>
+                <a href="#services" className="text-white/50 hover:text-gold transition-colors">Trade-In & Valuation</a>
+              </li>
+              <li>
+                <a href="#services" className="text-white/50 hover:text-gold transition-colors">After-Sales Support</a>
+              </li>
+            </ul>
+          </div>
+
+          {/* Column 4: Contact Us */}
+          <div>
+            <h3 className="font-sans text-sm font-semibold uppercase tracking-[0.2em] text-gold">Contact Us</h3>
+            <ul className="mt-6 space-y-4 text-sm">
+              <li className="flex items-start gap-3">
+                <MapPin className="h-5 w-5 shrink-0 text-gold mt-0.5" />
+                <span className="text-white/50">{settings.address}</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <Phone className="h-5 w-5 shrink-0 text-gold" />
+                <a href={`tel:${settings.phone.replace(/\s+/g, '')}`} className="text-white/50 hover:text-gold transition-colors">{settings.phone}</a>
+              </li>
+              <li className="flex items-center gap-3">
+                <Mail className="h-5 w-5 shrink-0 text-gold" />
+                <a href={`mailto:${settings.email}`} className="text-white/50 hover:text-gold transition-colors">{settings.email}</a>
+              </li>
+            </ul>
           </div>
         </div>
-        <div className="mt-8 flex flex-col gap-3 border-t border-white/10 pt-6 text-xs uppercase tracking-[0.24em] text-white/35 lg:flex-row lg:items-center lg:justify-between">
-          <span>© 2026 VELOCE AUTO</span>
-          <span>{settings.email}</span>
-          <div className="flex gap-4">
-            <a href="#">Legal</a>
-            <a href="#">Privacy</a>
-            <a href="#">Terms</a>
-          </div>
+
+        {/* Bottom bar */}
+        <div className="mt-16 border-t border-white/5 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-[10px] uppercase tracking-[0.25em] text-white/30">
+          <span>© 2026 VELOCE AUTO. ALL RIGHTS RESERVED.</span>
+          <span>MANAGED BY GOLD STANDARD AGENCIES</span>
         </div>
       </div>
     </footer>
-  );
-}
-
-function FooterLinks({ title, links }: { title: string; links: string[] }) {
-  return (
-    <div>
-      <p className="text-xs uppercase tracking-[0.35em] text-gold">{title}</p>
-      <div className="mt-4 space-y-3 text-sm text-white/60">
-        {links.slice(0, 6).map((link) => (
-          <div key={link}>{link}</div>
-        ))}
-      </div>
-    </div>
   );
 }
 
