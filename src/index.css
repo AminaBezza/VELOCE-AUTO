@@ -1,0 +1,132 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+  --bg: #05070a;
+  --panel: #11151b;
+  --border: #212833;
+  --gold: #34d399;
+  --ivory: #f3efe8;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background:
+    radial-gradient(circle at top left, rgba(52, 211, 153, 0.12), transparent 22%),
+    radial-gradient(circle at top right, rgba(56, 189, 248, 0.08), transparent 30%),
+    var(--bg);
+  color: #f7f2ea;
+  font-family: 'Jost', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+::selection {
+  background: rgba(52, 211, 153, 0.3);
+  color: white;
+}
+
+.luxury-glass {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(18px);
+}
+
+.luxury-input,
+.luxury-select {
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 0.85rem;
+  background: rgba(5, 8, 12, 0.78);
+  color: #f6f2ea;
+  padding: 0.95rem 1rem;
+  font-size: 0.9rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.luxury-input::placeholder {
+  color: rgba(255, 255, 255, 0.42);
+}
+
+.luxury-input:focus,
+.luxury-select:focus {
+  outline: none;
+  border-color: rgba(52, 211, 153, 0.55);
+  box-shadow: 0 0 0 4px rgba(52, 211, 153, 0.12);
+  background: rgba(8, 12, 16, 0.92);
+}
+
+.shadow-luxury {
+  box-shadow: 0 24px 90px rgba(0, 0, 0, 0.42);
+}
+
+.text-shadow {
+  text-shadow: 0 8px 36px rgba(0, 0, 0, 0.55);
+}
+
+.gold-line {
+  background: linear-gradient(90deg, transparent, rgba(52, 211, 153, 0.98), transparent);
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hero feature cards */
+.hero-feature-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hero-feature-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(16, 185, 129, 0.08);
+}
+
+/* Hero search bar */
+.hero-search-bar {
+  transition: all 0.3s ease;
+}
+
+.hero-search-input,
+.hero-search-select {
+  appearance: none;
+  -webkit-appearance: none;
+  font-family: 'Jost', sans-serif;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hero-search-input:focus,
+.hero-search-select:focus {
+  box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.1);
+}
+
+.hero-search-select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.4)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 32px;
+  cursor: pointer;
+}
+
+.hero-search-select option {
+  background: #161b22;
+  color: #f6f2ea;
+}
+
